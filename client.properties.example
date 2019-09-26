@@ -1,0 +1,181 @@
+# Server host name (or IP) and port
+host = localhost
+port = 1122
+
+# SSL trustStore key
+trustStore = screenlocker.jks
+
+# Server reconnection delay
+socketDelay = 10000
+
+# Background image file name
+# By default screen is filled with BLUE color
+#backgroundImg = background.jpg
+
+# Preferred display modes
+# Comma separated display modes in following format
+# "<width>x<height> <bit depth> bit"
+# Sorted by priority
+# Defaults to "640x480 32 bit, 640x480 16 bit, 640x480 8 bit"
+#displayModes = 640x480 32 bit, 640x480 16 bit, 640x480 8 bit
+
+#################
+# Photo options #
+#################
+
+# Participant photo file name
+# photoFileName = img.jpg
+
+# Horizontal position of the photo
+# Defaults to 0% (left)
+#photoHorz = 100%
+
+# Vertical position of the photo
+# Defaults to 0% (top)
+#photoVert = 0%
+
+#######################
+# Computer id options #
+#######################
+
+# Specifies text, appearance and position of the computer id
+# Text is split into lines by adding \\
+id = 123
+
+# Computer id font
+# Font is parsed by "decode" method of java.util.Font
+# Defaults to "Times New Roman Plain 100"
+#idFont = Times New Roman Plain 100
+
+# Computer id color
+# Color is int parsed by "decode" method of java.util.Integer
+# Defaults to 0xffffff (white)
+#idColor = 0xffffff
+
+# Horizontal position of the computer id
+# Defaults to 100% (right)
+#idHorz = 100%
+
+# Vertical position of the computer id
+# Defaults to 0% (top)
+#idVert = 0%
+
+#########################
+# Computer name options #
+#########################
+
+# Specifies text, appearance and position of the computer name
+# Text is split into lines by adding \\
+name = Surname Name
+
+# Computer name font
+# Defaults to "Times New Roman Plain 100"
+#nameFont = Times New Roman Plain 100
+
+# Computer name color
+# Defaults to 0xffffff (white)
+#nameColor = 0xffffff
+
+# Horizontal position of the computer name
+# Defaults to 100% (right)
+#nameHorz = 50%
+
+# Vertical position of the computer name
+# Defaults to 15% (below top)
+#nameVert = 15%
+
+###################
+# Message options #
+###################
+
+# Specifies text, appearance and position of the message
+# Text is split into lines by adding \\
+message = Do not touch anything!
+
+# Message font
+# Defaults to "Times New Roman Plain 100"
+#messageFont = Times New Roman Plain 100
+
+# Message color
+# Defaults to 0xffffff (white)
+#messageColor = 0xffffff
+
+# Horizontal position of the message
+# Defaults to 50% (center)
+#messageHorz = 50%
+
+# Vertical position of the message
+# Defaults to 60% (below center)
+#messageVert = 60%
+
+################
+# Time options #
+################
+
+# Specifies countdown message template, appearance and position of the countdown message or time
+# Defaults to "Contest starting in %s"
+# Text is split into lines by adding \\
+#countdownTemplate = Contest starting in %s
+
+# Time font
+# Defaults to "Times New Roman Plain 100"
+#timeFont = Times New Roman Plain 100
+
+# Time color
+# Defaults to 0xffffff (white)
+#timeColor = 0xffffff
+
+# Horizontal position of the countdown message or time
+# Defaults to 50% (center)
+#timeHorz = 50%
+
+# Vertical position of the countdown message or time
+# Defaults to 75% (below center)
+#timeVert = 75%
+
+###############################
+# Information message options #
+###############################
+
+# This place is for system messages
+# It shows Offline status, IP address and client ID
+# Specifies appearance and position of the information message
+
+# Information message font
+# Defaults to "Times New Roman Plain 100"
+#infoMessageFont = Times New Roman Plain 100
+
+# Information message color
+# Defaults to 0xffff00 (yellow)
+#infoMessageColor = 0xffff00
+
+# Horizontal position of the information message
+# Defaults to 50% (center)
+#infoMessageHorz = 50%
+
+# Vertical position of the information message
+# Defaults to 40% (above center)
+#infoMessageVert = 40%
+
+#################################
+# Operating System (OS) options #
+#################################
+
+# Specifies appearance and position of the OS
+# It shows System.getProperty("os.name")
+
+# OS font
+# Defaults to "Times New Roman Plain 100"
+#osFont = Times New Roman Plain 100
+
+# OS color
+# Defaults to 0x00ffff (cyan)
+#osColor = 0xffffff
+
+# Horizontal position of the OS
+# Defaults to 0% (left)
+#osHorz = 0%
+
+# Vertical position of the OS
+# Defaults to 100% (bottom)
+#osVert = 100%
