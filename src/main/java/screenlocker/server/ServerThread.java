@@ -5,11 +5,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ServerThread extends Thread {
     Socket socket;
     PrintWriter out;
     BufferedReader in;
+    Map<String, String> params;
 
     public ServerThread(Socket socket) {
         this.socket = socket;
@@ -19,6 +22,7 @@ public class ServerThread extends Thread {
         try {
             out = new PrintWriter(socket.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            params = new HashMap<>();
 
             if (Server.unlockTime > 0) {
                 send("set unlockTime " + Server.unlockTime);
@@ -35,6 +39,11 @@ public class ServerThread extends Thread {
                     String mac = line.substring("MAC ".length());
                     String id = Server.clientIds.computeIfAbsent(mac, k -> "" + this.getId());
                     send("set id " + id);
+                    params.put("MAC", mac);
+                    params.put("ID", id);
+                } else if (line.startsWith("IP ")) {
+                    String ip = line.substring("IP ".length());
+                    params.put("IP", ip);
                 }
             }
             System.out.printf("Thread %d exited\n", getId());

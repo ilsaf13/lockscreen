@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Server {
@@ -65,6 +66,9 @@ public class Server {
                         } else if (line.equals("save")) {
                             saveClientIds();
                             continue;
+                        } else if (line.startsWith("save ")) {
+                            saveParam(line.substring("save ".length()));
+                            continue;
                         }
                         int cnt = 0;
                         for (ServerThread t : threads.values()) {
@@ -93,6 +97,7 @@ public class Server {
             clientIds = p.toConcurrentHashMap();
         } catch (IOException ignored) {
             System.out.printf("ERROR: Couldn't load client IDs from '%s'\n", properties.get("clientIds"));
+            clientIds = new ConcurrentHashMap<>();
         }
     }
 
@@ -100,6 +105,21 @@ public class Server {
         try {
             new Props(clientIds).store(new FileWriter(properties.get("clientIds")));
             System.out.println(properties.get("clientIds") + " saved");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void saveParam(String key) {
+        Properties p = new Properties();
+        for (ServerThread st : threads.values()) {
+            if (st.params.containsKey("MAC") && st.params.containsKey(key))
+                p.put(st.params.get("MAC"), st.params.get(key));
+        }
+        try {
+            String fName = "client-" + key + ".properties";
+            p.store(new FileWriter(fName), key + " of clients");
+            System.out.println(fName + " saved");
         } catch (IOException e) {
             e.printStackTrace();
         }

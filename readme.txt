@@ -5,6 +5,7 @@ Supported commands:
 
    	set lockscreenId - shows client ID instead of computer ID
    	save - saves client IDs into .properties file
+   	save ips - saves client IP addresses into client-IP.properties file
    	exit - stops all clients
    	reload - reloads all clients
 
@@ -13,3 +14,4 @@ Supported commands:
 
    	MAC <00:00:00:00:00> - sent by client when the socket is established. Server sets client ID according to MAC
    	set id <id> - server automatically sets unique ID for each client when socket is established using this command
+   	IP <10.10.0.1> - sent by client when the socket is established.

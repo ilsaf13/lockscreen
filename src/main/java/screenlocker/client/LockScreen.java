@@ -41,13 +41,7 @@ public class LockScreen implements Runnable {
 
     Color bgColor = Color.blue;
 
-    private static DisplayMode[] BEST_DISPLAY_MODES = new DisplayMode[]{
-//            new DisplayMode(1920, 1080, 32, 0),
-//            new DisplayMode(1366, 768, 32, 0),
-            new DisplayMode(640, 480, 32, 0),
-            new DisplayMode(640, 480, 16, 0),
-            new DisplayMode(640, 480, 8, 0)
-    };
+    private static DisplayMode[] BEST_DISPLAY_MODES;
 
     public void init(Props props) {
         this.props = props;

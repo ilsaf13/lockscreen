@@ -35,6 +35,18 @@ public class Client {
         socketDelay = properties.getLong("socketDelay", 10000);
     }
 
+    static String getMacString(byte[] mac) {
+        StringBuilder macString = null;
+        if (mac != null && mac.length > 0) {
+            macString = new StringBuilder().append(String.format("%02X", mac[0]));
+            for (int i = 1; i < mac.length; i++) {
+                macString.append(":").append(String.format("%02X", mac[i]));
+            }
+        }
+        if (macString != null) return macString.toString();
+        return null;
+    }
+
     void run() throws InterruptedException {
         LockScreen lockScreen = new LockScreen(this, properties);
         new Thread(lockScreen).start();
@@ -44,21 +56,18 @@ public class Client {
                 SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
                 Socket socket = factory.createSocket(host, port);
 
-                byte[] mac = NetworkInterface.getByInetAddress(socket.getLocalAddress()).getHardwareAddress();
-                StringBuilder macString = null;
-                if (mac != null && mac.length > 0) {
-                    macString = new StringBuilder().append(String.format("%02X", mac[0]));
-                    for (int i = 1; i < mac.length; i++) {
-                        macString.append(":").append(String.format("%02X", mac[i]));
-                    }
+                String macString = getMacString(NetworkInterface.getByInetAddress(socket.getLocalAddress()).getHardwareAddress());
+                String ipString = socket.getLocalAddress().getHostAddress();
 
-                }
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream());
                 System.out.println("Connected to server");
 
                 if (macString != null) {
-                    send("MAC " + macString.toString());
+                    send("MAC " + macString);
+                }
+                if (ipString != null) {
+                    send("IP " + ipString);
                 }
 
                 lockScreen.setInfoMessage("");
