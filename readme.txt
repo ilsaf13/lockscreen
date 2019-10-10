@@ -5,7 +5,7 @@ Supported commands:
 
    	set lockscreenId - shows client ID instead of computer ID
    	save - saves client IDs into .properties file
-   	save ips - saves client IP addresses into client-IP.properties file
+   	save <key> - saves client property with key <key> into client-<key>.properties file. Possible values for key: MAC, ID, IP.
    	exit - stops all clients
    	reload - reloads all clients
 
