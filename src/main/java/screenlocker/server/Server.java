@@ -118,7 +118,9 @@ public class Server {
         }
         try {
             String fName = "client-" + key + ".properties";
-            p.store(new FileWriter(fName), key + " of clients");
+            FileWriter fw = new FileWriter(fName);
+            p.store(fw, key + " of clients");
+            fw.close();
             System.out.println(fName + " saved");
         } catch (IOException e) {
             e.printStackTrace();

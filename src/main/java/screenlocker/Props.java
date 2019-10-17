@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,11 +15,22 @@ public class Props {
 
     public Props(String filename) throws IOException {
         properties = new Properties();
-        properties.load(new InputStreamReader(new FileInputStream(filename), "UTF-8"));
+        InputStreamReader isr = new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8);
+        properties.load(isr);
+        isr.close();
+    }
+
+    public static Properties loadProperties(String filename) throws IOException {
+        Properties properties = new Properties();
+        InputStreamReader isr = new InputStreamReader(new FileInputStream(filename), StandardCharsets.UTF_8);
+        properties.load(isr);
+        isr.close();
+        return properties;
     }
 
     public Props(Properties properties) {
-        this.properties = properties;
+        this.properties = new Properties();
+        this.properties.putAll(properties);
     }
 
     public Props(Map<String, String> map) {
@@ -28,10 +40,15 @@ public class Props {
 
     public void store(FileWriter fw) throws IOException {
         properties.store(fw, "");
+        fw.close();
     }
 
     public ConcurrentHashMap<String, String> toConcurrentHashMap() {
         return new ConcurrentHashMap(properties);
+    }
+
+    public void put(String key, String value) {
+        properties.setProperty(key, value);
     }
 
     public String get(String key) {

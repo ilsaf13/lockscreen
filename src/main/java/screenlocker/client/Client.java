@@ -4,10 +4,12 @@ import screenlocker.Props;
 
 import javax.net.ssl.SSLSocketFactory;
 import java.awt.event.KeyEvent;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.NetworkInterface;
 import java.net.Socket;
-import java.util.Properties;
 
 public class Client {
     PrintWriter out;

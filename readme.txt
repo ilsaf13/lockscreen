@@ -1,5 +1,5 @@
 Supported commands:
-   	set unlockTime <HH:mm> - sets unlock time on clients
+   	set unlockTime <HH:mm> - sets unlock time on clients. Set unlock time to -1 makes it undefined again.
    	set serverTime - sends server time in milliseconds to clients to synchronize unlock time. Does not take into account network latency!
    	set pinCode <5 chars pin code> - sets pin code on clients used to stop alt+tab stopper
 
@@ -15,3 +15,9 @@ Supported commands:
    	MAC <00:00:00:00:00> - sent by client when the socket is established. Server sets client ID according to MAC
    	set id <id> - server automatically sets unique ID for each client when socket is established using this command
    	IP <10.10.0.1> - sent by client when the socket is established.
+
+Ubuntu 18.04
+    Edit the accessibility.properties file for OpenJDK:
+        /etc/java-8-openjdk/accessibility.properties
+    Comment out the following line:
+        assistive_technologies=org.GNOME.Accessibility.AtkWrapper
