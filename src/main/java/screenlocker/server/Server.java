@@ -7,9 +7,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Server {
@@ -40,6 +38,7 @@ public class Server {
                 while (true) {
                     try {
                         String line = br.readLine();
+                        Set<String> ids = new HashSet<>();
                         if (line.startsWith("set unlockTime ")) {
                             unlockTime = -1;
                             try {
@@ -69,11 +68,27 @@ public class Server {
                         } else if (line.startsWith("save ")) {
                             saveParam(line.substring("save ".length()));
                             continue;
+                        } else if (line.startsWith("exit")) {
+                            String[] parts = line.split(" ");
+                            for (int i = 1; i < parts.length; i++) {
+                                ids.add(parts[i]);
+                            }
+                            line = "exit";
                         }
+
                         int cnt = 0;
-                        for (ServerThread t : threads.values()) {
-                            t.send(line);
-                            cnt++;
+                        if (ids.size() == 0) {
+                            for (ServerThread t : threads.values()) {
+                                t.send(line);
+                                cnt++;
+                            }
+                        } else {
+                            for (ServerThread t : threads.values()) {
+                                if (ids.contains(t.params.get("ID"))) {
+                                    t.send(line);
+                                    cnt++;
+                                }
+                            }
                         }
                         System.out.printf("Sent to %d clients '%s'\n", cnt, line);
                     } catch (Exception e) {

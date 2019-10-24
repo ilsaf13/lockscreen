@@ -7,6 +7,7 @@ Supported commands:
    	save - saves client IDs into .properties file
    	save <key> - saves client property with key <key> into client-<key>.properties file. Possible values for key: MAC, ID, IP.
    	exit - stops all clients
+   	exit <id1> <id2> ... - stops listed clients
    	reload - reloads all clients
 
    	show id - shows client ID in information message
