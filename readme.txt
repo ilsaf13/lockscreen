@@ -1,3 +1,5 @@
+Generating SSL key:
+    keytool -genkey -alias <key-alias> -keystore <key-file-name>.jks
 Supported commands:
    	set unlockTime <HH:mm> - sets unlock time on clients. Set unlock time to -1 makes it undefined again.
    	set serverTime - sends server time in milliseconds to clients to synchronize unlock time. Does not take into account network latency!
