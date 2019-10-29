@@ -66,7 +66,7 @@ public class Server {
                             saveClientIds();
                             continue;
                         } else if (line.startsWith("save ")) {
-                            saveParam(line.substring("save ".length()));
+                            saveParams(line.substring("save ".length()));
                             continue;
                         } else if (line.startsWith("exit")) {
                             String[] parts = line.split(" ");
@@ -125,16 +125,30 @@ public class Server {
         }
     }
 
-    static void saveParam(String key) {
+    static void saveParams(String keys) {
         Properties p = new Properties();
+        String[] parts = keys.split(" ");
         for (ServerThread st : threads.values()) {
-            if (st.params.containsKey("MAC") && st.params.containsKey(key))
-                p.put(st.params.get("MAC"), st.params.get(key));
+            if (st.params.containsKey("MAC")) {
+                StringBuilder sb = new StringBuilder();
+                for(String key : parts) {
+                    String v = st.params.get(key);
+                    if (sb.length() > 0) {
+                        sb.append(", ");
+                    }
+                    if (v == null) {
+                        sb.append("null");
+                    } else {
+                        sb.append(v);
+                    }
+                }
+                p.put(st.params.get("MAC"), sb.toString());
+            }
         }
         try {
-            String fName = "client-" + key + ".properties";
+            String fName = "client-" + keys.replaceAll(" ", "-") + ".properties";
             FileWriter fw = new FileWriter(fName);
-            p.store(fw, key + " of clients");
+            p.store(fw, keys + " of clients");
             fw.close();
             System.out.println(fName + " saved");
         } catch (IOException e) {
