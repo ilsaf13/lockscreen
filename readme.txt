@@ -6,7 +6,7 @@ Supported commands:
    	set pinCode <5 chars pin code> - sets pin code on clients used to stop alt+tab stopper
 
    	set lockscreenId - shows client ID instead of computer ID
-   	save - saves client IDs into .properties file
+   	save - saves client IDs and IPs into .properties files
    	save <key1> <key2> ... - saves client property with keys <key1>, <key2> and so on into client-<key1>-<key2>-<...>.properties file. Possible values for key: MAC, ID, IP.
    	exit - stops all clients
    	exit <id1> <id2> ... - stops listed clients
@@ -24,3 +24,13 @@ Ubuntu 18.04
         /etc/java-8-openjdk/accessibility.properties
     Comment out the following line:
         assistive_technologies=org.GNOME.Accessibility.AtkWrapper
+
+Windows
+    Add firewall rule on server
+        netsh advfirewall firewall add rule name="Screenlocker UDP out" dir=out action=allow protocol=UDP localport=<server_port>
+        netsh advfirewall firewall add rule name="Screenlocker UDP in" dir=in action=allow protocol=UDP localport=<server_port>
+        netsh advfirewall firewall add rule name="Screenlocker TCP out" dir=out action=allow protocol=TCP localport=<server_port>
+        netsh advfirewall firewall add rule name="Screenlocker TCP in" dir=in action=allow protocol=TCP localport=<server_port>
+    Uninstall onedrive on client user level to avoid randomly minimizing lockscreen window
+        %SystemRoot%\SysWOW64\OneDriveSetup.exe /uninstall
+

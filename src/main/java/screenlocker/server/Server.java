@@ -9,14 +9,18 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Server {
     static volatile long unlockTime = -1;
+    static AtomicInteger pingSuccess = new AtomicInteger(0);
     //pin code must be 5 digits
     static String pinCode = "12345";
     static final Map<Long, ServerThread> threads = new ConcurrentHashMap<>();
     //maps clients MAC to unique ID
     static Map<String, String> clientIds;
+    //maps clients IP to unique ID
+    static Map<String, String> clientIps;
     static Props properties;
 
     public static void main(String[] args) throws IOException {
@@ -29,6 +33,7 @@ public class Server {
         ServerSocket serverSocket = socketFactory.createServerSocket(properties.getInt("port"));
 
         loadClientIds();
+        clientIps = new ConcurrentHashMap<>();
 
         new Thread() {
             @Override
@@ -40,17 +45,8 @@ public class Server {
                         String line = br.readLine();
                         Set<String> ids = new HashSet<>();
                         if (line.startsWith("set unlockTime ")) {
-                            unlockTime = -1;
-                            try {
-                                String t = line.substring("set unlockTime ".length());
-                                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-                                long day = 24 * 60 * 60 * 1000;
-                                unlockTime = sdf.parse(t).getTime() + System.currentTimeMillis() / day * day;
-                                System.out.println(new Date(unlockTime));
-                            } catch (ParseException ignored) {
-                            }
+                            setUnlockTime(line.substring("set unlockTime ".length()));
                             line = "set unlockTime " + unlockTime;
-
                         } else if (line.equals("set serverTime")) {
                             line += " " + System.currentTimeMillis();
                         } else if (line.startsWith("set pinCode ")) {
@@ -64,10 +60,13 @@ public class Server {
                             }
                         } else if (line.equals("save")) {
                             saveClientIds();
+                            saveClientIps();
                             continue;
                         } else if (line.startsWith("save ")) {
                             saveParams(line.substring("save ".length()));
                             continue;
+                        } else if (line.equals("ping")) {
+                            pingSuccess = new AtomicInteger(0);
                         } else if (line.startsWith("exit")) {
                             String[] parts = line.split(" ");
                             for (int i = 1; i < parts.length; i++) {
@@ -125,6 +124,15 @@ public class Server {
         }
     }
 
+    static void saveClientIps() {
+        try {
+            new Props(clientIps).store(new FileWriter(properties.get("clientIps")));
+            System.out.println(properties.get("clientIps") + " saved");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     static void saveParams(String keys) {
         Properties p = new Properties();
         String[] parts = keys.split(" ");
@@ -153,6 +161,17 @@ public class Server {
             System.out.println(fName + " saved");
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    static void setUnlockTime(String time) {
+        unlockTime = -1;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+            long day = 24 * 60 * 60 * 1000;
+            unlockTime = sdf.parse(time).getTime() + System.currentTimeMillis() / day * day;
+            System.out.println(new Date(unlockTime));
+        } catch (ParseException ignored) {
         }
     }
 }

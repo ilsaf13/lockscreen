@@ -63,13 +63,26 @@ public class Props {
         return Integer.parseInt(get(key));
     }
 
-    public int getInt(String key, String defaultValue) {
-        return Integer.parseInt(getString(key, defaultValue));
+    public int getInt(String key, int defaultValue) {
+        if (properties.containsKey(key)) {
+            return Integer.parseInt(get(key));
+        } else {
+            return defaultValue;
+        }
+
     }
 
     public long getLong(String key, long defaultValue) {
         if (properties.containsKey(key)) {
             return Long.parseLong(get(key));
+        } else {
+            return defaultValue;
+        }
+    }
+
+    public boolean getBoolean(String key, boolean defaultValue) {
+        if (properties.containsKey(key)) {
+            return Boolean.parseBoolean(get(key));
         } else {
             return defaultValue;
         }

@@ -57,7 +57,7 @@ public class LockScreen implements Runnable {
                     props.getFraction("photoVert", "0")
             );
         } catch (IOException e) {
-            System.out.println("Error loading photo");
+//            System.out.println("Error loading photo");
         }
         id = getStaticText(props, "id",
                 defaultFont, Color.white,
@@ -97,7 +97,7 @@ public class LockScreen implements Runnable {
         device = env.getDefaultScreenDevice();
         GraphicsConfiguration gc = device.getDefaultConfiguration();
         mainFrame = new Frame(gc);
-        ats = new AltTabStopper(mainFrame);
+        ats = new AltTabStopper(mainFrame, props.getBoolean("startAltTabStopper", false));
         mainFrame.addKeyListener(new KeyListener() {
             public void keyTyped(KeyEvent e) {
             }
@@ -108,7 +108,7 @@ public class LockScreen implements Runnable {
             public void keyReleased(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ALT) return;
                 if (e.getKeyCode() == KeyEvent.VK_WINDOWS) {
-                    System.out.println("Windows key pressed");
+//                    System.out.println("Windows key pressed");
                 }
                 keysPressed.addLast(e.getKeyCode());
                 if (checkPinCode()) {

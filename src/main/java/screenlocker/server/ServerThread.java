@@ -33,17 +33,22 @@ public class ServerThread extends Thread {
 
             String line;
             while ((line = in.readLine()) != null) {
-                System.out.printf("Thread %d got '%s'\n", getId(), line);
                 if (line.equals("exit")) break;
                 else if (line.startsWith("MAC ")) {
                     String mac = line.substring("MAC ".length());
-                    String id = Server.clientIds.computeIfAbsent(mac, k -> "" + this.getId());
+                    String id = Server.clientIds.computeIfAbsent(mac, k -> "#" + this.getId());
                     send("set id " + id);
                     params.put("MAC", mac);
                     params.put("ID", id);
+                    System.out.printf("Client %s connected\n", id);
                 } else if (line.startsWith("IP ")) {
                     String ip = line.substring("IP ".length());
                     params.put("IP", ip);
+                    Server.clientIps.put(ip, params.getOrDefault("ID", "NULL"));
+                } else if (line.startsWith("echo ")) {
+                    System.out.printf("Got echo %d times\r", Server.pingSuccess.incrementAndGet());
+                } else {
+                    System.out.printf("Thread %d got '%s'\n", getId(), line);
                 }
             }
             System.out.printf("Thread %d exited\n", getId());

@@ -2,3 +2,4 @@ keyStore = screenlocker.jks
 keyStorePassword = password
 port = 1122
 clientIds = clients.properties
+clientIps = ips.properties

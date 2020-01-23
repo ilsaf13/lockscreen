@@ -8,6 +8,10 @@ trustStore = screenlocker.jks
 # Server reconnection delay
 socketDelay = 10000
 
+# Start alt+tab stopper
+# By default alt+tab stopper not started
+#startAltTabStopper = false
+
 # Background image file name
 # By default screen is filled with BLUE color
 #backgroundImg = background.jpg

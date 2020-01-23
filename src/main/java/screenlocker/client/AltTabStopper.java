@@ -4,22 +4,23 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class AltTabStopper implements Runnable {
-    private volatile boolean working = true;
+    private volatile boolean working = false;
     private Frame frame;
 
-    public AltTabStopper(Frame frame) {
+    public AltTabStopper(Frame frame, boolean working) {
         this.frame = frame;
+        this.working = working;
     }
 
     public void stop() {
         working = false;
     }
 
-    public static AltTabStopper create(Frame frame) {
-        AltTabStopper stopper = new AltTabStopper(frame);
-        new Thread(stopper, "Alt-Tab Stopper").start();
-        return stopper;
-    }
+//    public static AltTabStopper create(Frame frame) {
+//        AltTabStopper stopper = new AltTabStopper(frame);
+//        new Thread(stopper, "Alt-Tab Stopper").start();
+//        return stopper;
+//    }
 
     public void run() {
         try {
@@ -33,7 +34,7 @@ public class AltTabStopper implements Runnable {
                 frame.toFront();
                 frame.requestFocus();
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(20);
                 } catch (Exception e) {
                 }
             }
@@ -41,6 +42,6 @@ public class AltTabStopper implements Runnable {
             e.printStackTrace();
             System.exit(-1);
         }
-        System.out.println("Stopping alt+tab stopper");
+//        System.out.println("Stopping alt+tab stopper");
     }
 }

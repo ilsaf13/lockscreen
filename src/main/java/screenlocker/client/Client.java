@@ -8,15 +8,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
+import java.net.SocketAddress;
 
 public class Client {
     PrintWriter out;
     String host;
     int port;
     String trustStore;
-    long socketDelay;
+    int socketDelay;
     Props properties;
     String propertiesFileName;
     String id;
@@ -34,7 +36,7 @@ public class Client {
         host = properties.get("host");
         port = properties.getInt("port");
         trustStore = properties.get("trustStore");
-        socketDelay = properties.getLong("socketDelay", 10000);
+        socketDelay = properties.getInt("socketDelay", 10000);
     }
 
     static String getMacString(byte[] mac) {
@@ -56,7 +58,9 @@ public class Client {
         while (lockScreen.running) {
             try {
                 SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-                Socket socket = factory.createSocket(host, port);
+                Socket socket = factory.createSocket();
+                SocketAddress socketAddress = new InetSocketAddress(host, port);
+                socket.connect(socketAddress, socketDelay);
 
                 String macString = getMacString(NetworkInterface.getByInetAddress(socket.getLocalAddress()).getHardwareAddress());
                 String ipString = socket.getLocalAddress().getHostAddress();
@@ -75,7 +79,7 @@ public class Client {
                 lockScreen.setInfoMessage("");
                 String line;
                 while ((line = in.readLine()) != null) {
-                    System.out.printf("Client got '%s'\n", line);
+//                    System.out.printf("Client got '%s'\n", line);
                     if (line.equals("exit")) {
                         exit();
                         return;
@@ -99,12 +103,14 @@ public class Client {
                         }
                     } else if (line.startsWith("set id ")) {
                         id = line.substring("set id ".length());
-                    } else if (line.equals("set lockscreenId")) {
+                    } else if (line.equalsIgnoreCase("set lockscreenId")) {
                         if (id != null) lockScreen.setId(id);
-                    } else if (line.equals("show id")) {
+                    } else if (line.equalsIgnoreCase("show id")) {
                         lockScreen.setInfoMessage("" + id);
-                    } else if (line.equals("show ip")) {
+                    } else if (line.equalsIgnoreCase("show ip")) {
                         lockScreen.setInfoMessage("" + socket.getLocalAddress().getHostAddress());
+                    } else if (line.equalsIgnoreCase("ping")) {
+                        send("echo " + id);
                     }
                 }
             } catch (Exception e) {
