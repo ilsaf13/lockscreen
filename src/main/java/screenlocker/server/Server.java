@@ -124,9 +124,42 @@ public class Server {
         }
     }
 
+    static class Pair implements Comparable<Pair> {
+        String id, ip;
+
+        public Pair(String id, String ip) {
+            this.id = id;
+            this.ip = ip;
+        }
+
+        @Override
+        public int compareTo(Pair o) {
+            if (!id.equals(o.id)) return id.compareTo(o.id);
+            return ip.compareTo(o.ip);
+        }
+    }
     static void saveClientIps() {
         try {
-            new Props(clientIps).store(new FileWriter(properties.get("clientIps")));
+            Pair[] pairs = new Pair[clientIps.size()];
+            int i = 0;
+            for (Map.Entry<String, String> entry : clientIps.entrySet()){
+                pairs[i] = new Pair(entry.getValue(), entry.getKey());
+                i++;
+            }
+            Arrays.sort(pairs);
+            PrintWriter pw = new PrintWriter(properties.get("clientIps"));
+            pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+            pw.println("<computers>");
+            i = 0;
+            for(; i < pairs.length;) {
+                pw.printf("\t<room name=\"%d\">\n", 1 + i / 10);
+                for (int j = 0; j < 10 && i < pairs.length; j++, i++) {
+                    pw.printf("\t\t<comp ip=\"%s\" name=\"%s\" />\n", pairs[i].ip, pairs[i].id);
+                }
+                pw.println("\t</room>");
+            }
+            pw.println("</computers>");
+            pw.close();
             System.out.println(properties.get("clientIps") + " saved");
         } catch (IOException e) {
             e.printStackTrace();

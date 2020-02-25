@@ -83,6 +83,8 @@ public class Client {
                     if (line.equals("exit")) {
                         exit();
                         return;
+                    } else if(line.equals("stop alttab")){
+                        lockScreen.ats.stop();
                     } else if (line.equals("reload")) {
                         init(propertiesFileName);
                         lockScreen.init(properties);
@@ -109,7 +111,9 @@ public class Client {
                         lockScreen.setInfoMessage("" + id);
                     } else if (line.equalsIgnoreCase("show ip")) {
                         lockScreen.setInfoMessage("" + socket.getLocalAddress().getHostAddress());
-                    } else if (line.equalsIgnoreCase("ping")) {
+                    } else if(line.startsWith("show ")){
+                        lockScreen.setInfoMessage(line.substring("show ".length()));
+                    }else if (line.equalsIgnoreCase("ping")) {
                         send("echo " + id);
                     }
                 }

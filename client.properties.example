@@ -44,7 +44,7 @@ socketDelay = 10000
 
 # Specifies text, appearance and position of the computer id
 # Text is split into lines by adding \\
-id = 123
+#id = 123
 
 # Computer id font
 # Font is parsed by "decode" method of java.util.Font
@@ -70,7 +70,7 @@ id = 123
 
 # Specifies text, appearance and position of the computer name
 # Text is split into lines by adding \\
-name = Surname Name
+#name = Surname Name
 
 # Computer name font
 # Defaults to "Times New Roman Plain 100"
