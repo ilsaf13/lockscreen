@@ -12,9 +12,11 @@ import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Client {
     PrintWriter out;
+    BufferedReader in;
     String host;
     int port;
     String trustStore;
@@ -55,26 +57,41 @@ public class Client {
         LockScreen lockScreen = new LockScreen(this, properties);
         new Thread(lockScreen).start();
         System.setProperty("javax.net.ssl.trustStore", trustStore);
+
+
         while (lockScreen.running) {
+            SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+            Socket socket = null;
+            Thread keepalive = null;
             try {
-                SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-                Socket socket = factory.createSocket();
+                lockScreen.setInfoMessage("Connecting");
+                socket = factory.createSocket();
                 SocketAddress socketAddress = new InetSocketAddress(host, port);
                 socket.connect(socketAddress, socketDelay);
+                socket.setSoTimeout(2 * socketDelay);
+                socket.setKeepAlive(true);
 
                 String macString = getMacString(NetworkInterface.getByInetAddress(socket.getLocalAddress()).getHardwareAddress());
                 String ipString = socket.getLocalAddress().getHostAddress();
 
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream());
+
                 System.out.println("Connected to server");
 
                 if (macString != null) {
+                    System.out.println("Sending MAC");
                     send("MAC " + macString);
                 }
                 if (ipString != null) {
+                    System.out.println("Sending IP");
                     send("IP " + ipString);
                 }
+
+                //keep alive
+                keepalive = new Thread(new SocketKeepAlive(this));
+                keepalive.start();
+                System.out.println("Started " + keepalive.getId());
 
                 lockScreen.setInfoMessage("");
                 String line;
@@ -83,7 +100,7 @@ public class Client {
                     if (line.equals("exit")) {
                         exit();
                         return;
-                    } else if(line.equals("stop alttab")){
+                    } else if (line.equals("stop alttab")) {
                         lockScreen.ats.stop();
                     } else if (line.equals("reload")) {
                         init(propertiesFileName);
@@ -111,10 +128,13 @@ public class Client {
                         lockScreen.setInfoMessage("" + id);
                     } else if (line.equalsIgnoreCase("show ip")) {
                         lockScreen.setInfoMessage("" + socket.getLocalAddress().getHostAddress());
-                    } else if(line.startsWith("show ")){
+                    } else if (line.startsWith("show ")) {
                         lockScreen.setInfoMessage(line.substring("show ".length()));
-                    }else if (line.equalsIgnoreCase("ping")) {
+                    } else if (line.equalsIgnoreCase("ping")) {
                         send("echo " + id);
+                    } else if (line.equals("alive")) {
+                        //ignore
+                        System.out.println("Server is alive");
                     }
                 }
             } catch (Exception e) {
@@ -122,6 +142,18 @@ public class Client {
                 lockScreen.setInfoMessage("OFFLINE");
                 System.out.printf("Waiting %d seconds to reconnect\n", socketDelay / 1000);
                 Thread.sleep(socketDelay);
+            }
+
+            try {
+                if (keepalive != null) {
+                    System.out.println("stopping keep alive thread");
+                    keepalive.interrupt();
+                }
+                if (in != null) in.close();
+                if (out != null) out.close();
+                if (socket != null) socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

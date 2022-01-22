@@ -7,30 +7,46 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class ServerThread extends Thread {
     Socket socket;
-    PrintWriter out;
+    final PrintWriter out;
     BufferedReader in;
     Map<String, String> params;
+    private BlockingQueue<String> msgQueue = new LinkedBlockingQueue<>();
+    Thread printThread;
 
-    public ServerThread(Socket socket) {
+    public ServerThread(Socket socket) throws IOException {
         this.socket = socket;
+        out = new PrintWriter(socket.getOutputStream());
+        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+        printThread = new Thread(() -> {
+            try {
+                while (!Thread.currentThread().isInterrupted()) {
+                    out.println(msgQueue.take());
+                    out.flush();
+                }
+            } catch (InterruptedException e) {
+                //Thread.currentThread().interrupt();
+            }
+            //System.out.println("Stopping thread " + Thread.currentThread().getId());
+        });
+        printThread.start();
     }
 
     public void run() {
         try {
-            out = new PrintWriter(socket.getOutputStream());
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             params = new HashMap<>();
-
             if (Server.unlockTime > 0) {
                 send("set unlockTime " + Server.unlockTime);
             }
             if (Server.pinCode != null) {
                 send("set pinCode " + Server.pinCode);
             }
-
+            socket.setSoTimeout(Server.socketSoTimeout);
             String line;
             while ((line = in.readLine()) != null) {
                 if (line.equals("exit")) break;
@@ -40,28 +56,38 @@ public class ServerThread extends Thread {
                     send("set id " + id);
                     params.put("MAC", mac);
                     params.put("ID", id);
-                    System.out.printf("Client %s connected\n", id);
+                    //System.out.printf("Client %s connected\n", id);
                 } else if (line.startsWith("IP ")) {
                     String ip = line.substring("IP ".length());
                     params.put("IP", ip);
                     Server.clientIps.put(ip, params.getOrDefault("ID", "NULL"));
                 } else if (line.startsWith("echo ")) {
                     System.out.printf("Got echo %d times\r", Server.pingSuccess.incrementAndGet());
+                } else if (line.equals("keepalive")) {
+//                    System.out.println("Keepalive from " + params.get("ID"));
+                    send("alive");
                 } else {
                     System.out.printf("Thread %d got '%s'\n", getId(), line);
                 }
             }
-            System.out.printf("Thread %d exited\n", getId());
+//            System.out.printf("Thread %d exited\n", getId());
+
+        } catch (IOException e) {
+            //e.printStackTrace();
+        }
+        try {
+            printThread.interrupt();
+            in.close();
             out.close();
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        //System.out.printf("Thread %d exited\n", getId());
         Server.threads.remove(getId());
     }
 
     public void send(String s) {
-        out.println(s);
-        out.flush();
+        msgQueue.offer(s);
     }
 }

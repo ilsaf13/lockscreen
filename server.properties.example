@@ -3,3 +3,4 @@ keyStorePassword = password
 port = 1122
 clientIds = clients.properties
 clientIps = ips.properties
+socketSoTimeout = 20000

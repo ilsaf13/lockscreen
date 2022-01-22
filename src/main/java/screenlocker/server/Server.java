@@ -16,6 +16,7 @@ public class Server {
     static AtomicInteger pingSuccess = new AtomicInteger(0);
     //pin code must be 5 digits
     static String pinCode = "12345";
+    static int socketSoTimeout;
     static final Map<Long, ServerThread> threads = new ConcurrentHashMap<>();
     //maps clients MAC to unique ID
     static Map<String, String> clientIds;
@@ -31,6 +32,7 @@ public class Server {
         System.setProperty("javax.net.ssl.keyStorePassword", properties.get("keyStorePassword"));
         SSLServerSocketFactory socketFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
         ServerSocket serverSocket = socketFactory.createServerSocket(properties.getInt("port"));
+        socketSoTimeout = properties.getInt("socketSoTimeout", 20_000);
 
         loadClientIds();
         clientIps = new ConcurrentHashMap<>();
@@ -80,7 +82,9 @@ public class Server {
                             for (ServerThread t : threads.values()) {
                                 t.send(line);
                                 cnt++;
+                                System.out.printf("Sent to %s\r", t.params.get("ID"));
                             }
+                            System.out.println();
                         } else {
                             for (ServerThread t : threads.values()) {
                                 if (ids.contains(t.params.get("ID"))) {
@@ -138,11 +142,12 @@ public class Server {
             return ip.compareTo(o.ip);
         }
     }
+
     static void saveClientIps() {
         try {
             Pair[] pairs = new Pair[clientIps.size()];
             int i = 0;
-            for (Map.Entry<String, String> entry : clientIps.entrySet()){
+            for (Map.Entry<String, String> entry : clientIps.entrySet()) {
                 pairs[i] = new Pair(entry.getValue(), entry.getKey());
                 i++;
             }
@@ -151,7 +156,7 @@ public class Server {
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
             pw.println("<computers>");
             i = 0;
-            for(; i < pairs.length;) {
+            for (; i < pairs.length; ) {
                 pw.printf("\t<room name=\"%d\">\n", 1 + i / 10);
                 for (int j = 0; j < 10 && i < pairs.length; j++, i++) {
                     pw.printf("\t\t<comp ip=\"%s\" name=\"%s\" />\n", pairs[i].ip, pairs[i].id);
@@ -172,7 +177,7 @@ public class Server {
         for (ServerThread st : threads.values()) {
             if (st.params.containsKey("MAC")) {
                 StringBuilder sb = new StringBuilder();
-                for(String key : parts) {
+                for (String key : parts) {
                     String v = st.params.get(key);
                     if (sb.length() > 0) {
                         sb.append(", ");
