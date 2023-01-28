@@ -4,6 +4,7 @@ port = 1122
 
 # SSL trustStore key
 trustStore = screenlocker.jks
+trustStorePassword = changeit
 
 # Server reconnection delay
 socketDelay = 10000

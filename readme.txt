@@ -1,5 +1,10 @@
 Generating SSL key:
-    keytool -genkey -alias <key-alias> -keystore <key-file-name>.jks
+    JDK8
+        keytool -genkey -alias <key-alias> -keystore <key-file-name>.jks
+    JDK17
+        keytool -genkey -alias <key-alias> -keystore <key-file-name>.jks -keyalg RSA -trustcacerts
+        keytool -export -alias <key-alias> -file <key-certificate>.cer -keystore <key-file-name>.jks
+        keytool -import -v -trustcacerts -alias <key-alias> -file <key-certificate>.cer -keystore <truststore-file-name>.jks
 Supported commands:
    	set unlockTime <HH:mm> - sets unlock time on clients. Set unlock time to -1 makes it undefined again.
    	set serverTime - sends server time in milliseconds to clients to synchronize unlock time. Does not take into account network latency!

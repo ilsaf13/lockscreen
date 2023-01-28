@@ -17,6 +17,7 @@ public class ServerThread extends Thread {
     Map<String, String> params;
     private BlockingQueue<String> msgQueue = new LinkedBlockingQueue<>();
     Thread printThread;
+    static final boolean log = false;
 
     public ServerThread(Socket socket) throws IOException {
         this.socket = socket;
@@ -32,7 +33,7 @@ public class ServerThread extends Thread {
             } catch (InterruptedException e) {
                 //Thread.currentThread().interrupt();
             }
-            //System.out.println("Stopping thread " + Thread.currentThread().getId());
+            if (log) System.out.println("Stopping thread " + Thread.currentThread().getId());
         });
         printThread.start();
     }
@@ -56,7 +57,7 @@ public class ServerThread extends Thread {
                     send("set id " + id);
                     params.put("MAC", mac);
                     params.put("ID", id);
-                    //System.out.printf("Client %s connected\n", id);
+                    if (log) System.out.printf("Client %s connected\n", id);
                 } else if (line.startsWith("IP ")) {
                     String ip = line.substring("IP ".length());
                     params.put("IP", ip);
@@ -64,16 +65,16 @@ public class ServerThread extends Thread {
                 } else if (line.startsWith("echo ")) {
                     System.out.printf("Got echo %d times\r", Server.pingSuccess.incrementAndGet());
                 } else if (line.equals("keepalive")) {
-//                    System.out.println("Keepalive from " + params.get("ID"));
+                    if (log) System.out.println("Keepalive from " + params.get("ID"));
                     send("alive");
                 } else {
                     System.out.printf("Thread %d got '%s'\n", getId(), line);
                 }
             }
-//            System.out.printf("Thread %d exited\n", getId());
+            if (log) System.out.printf("Thread %d exited\n", getId());
 
         } catch (IOException e) {
-            //e.printStackTrace();
+            if (log) e.printStackTrace();
         }
         try {
             printThread.interrupt();
@@ -83,7 +84,7 @@ public class ServerThread extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //System.out.printf("Thread %d exited\n", getId());
+        if (log) System.out.printf("Thread %d exited\n", getId());
         Server.threads.remove(getId());
     }
 

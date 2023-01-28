@@ -20,6 +20,7 @@ public class Client {
     String host;
     int port;
     String trustStore;
+    String trustStorePassword;
     int socketDelay;
     Props properties;
     String propertiesFileName;
@@ -38,6 +39,7 @@ public class Client {
         host = properties.get("host");
         port = properties.getInt("port");
         trustStore = properties.get("trustStore");
+        trustStorePassword = properties.get("trustStorePassword");
         socketDelay = properties.getInt("socketDelay", 10000);
     }
 
@@ -57,7 +59,8 @@ public class Client {
         LockScreen lockScreen = new LockScreen(this, properties);
         new Thread(lockScreen).start();
         System.setProperty("javax.net.ssl.trustStore", trustStore);
-
+        if (trustStorePassword != null)
+            System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
 
         while (lockScreen.running) {
             SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
